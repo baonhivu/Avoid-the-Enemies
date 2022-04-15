@@ -1,0 +1,73 @@
+extends Node
+
+
+# Declare member variables here. 
+
+export (PackedScene) var Enemy
+var score
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	
+	randomize()  # Randomly generate enemies. 
+
+
+# Called every frame. 'delta' is the elapsed time since the previous frame.
+#func _process(delta):
+#	pass
+
+
+func game_over():
+	
+	# When game ends, score and enemy timer stop, display game over.
+	$ScoreTimer.stop()
+	$EnemyTimer.stop()
+	$UI.show_game_over()
+	get_tree().call_group("enemies", "queue_free")
+	$Music.stop()
+	$Dead.play()
+
+
+func new_game():
+	
+	# Resets score, puts player in the sart position, displays "get ready".
+	score = 0
+	$Player.start($StartPosition.position)
+	$StartTimer.start()
+	$UI.update_score(score)
+	$UI.show_message("Get Ready")
+	$Music.play()
+
+
+func _on_ScoreTimer_timeout():
+	
+	# Updates score by 1 for every second in the game. 
+	score += 1
+	$UI.update_score(score)
+
+
+func _on_EnemyTimer_timeout():
+	
+	$EnemyPath/EnemySpawnLocation.offset = randi()  # Randomly choose spot in enemy path to spawn enemy. 
+	
+	var enemy = Enemy.instance()
+	add_child(enemy)
+	
+	var direction = $EnemyPath/EnemySpawnLocation.rotation + PI / 2  # Chooses direction that enemy moves in.
+	
+	enemy.position = $EnemyPath/EnemySpawnLocation.position  # Chooses position on path that enemy spawns. 
+	
+	direction += rand_range(-PI / 4, PI / 4)  # Sets the direction that enemy appears. 
+	enemy.rotation = direction
+	
+	# Chooses speed that enemy moves with. 
+	enemy.linear_velocity = Vector2(rand_range(enemy.min_speed, enemy.max_speed), 0)
+	enemy.linear_velocity = enemy.linear_velocity.rotated(direction)
+
+
+func _on_StartTimer_timeout():
+	
+	# Starts enemy and score timer. 
+	$EnemyTimer.start()
+	$ScoreTimer.start()
