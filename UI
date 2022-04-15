@@ -1,0 +1,45 @@
+extends CanvasLayer
+
+
+# Declare member variables here.
+
+signal start_game
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	pass # Replace with function body.
+
+
+func show_message(text):
+	
+	# Shows title screen message then starts message timer. 
+	$Message.text = text
+	$Message.show()
+	$MessageTimer.start()
+
+func show_game_over():
+	
+	# When game ends, dispaly "game over" and then resets title page. 
+	show_message("Game Over")
+	yield($MessageTimer, "timeout")
+
+	$Message.text = "Avoid the\nEnemies!"
+	$Message.show()
+	yield(get_tree().create_timer(1), "timeout")
+	$StartButton.show()
+
+func update_score(score):
+	$ScoreLabel.text = str(score)
+
+func _on_StartButton_pressed():
+	
+	# When pressed, hide start button and start the game. 
+	$StartButton.hide()
+	emit_signal("start_game")
+
+
+func _on_MessageTimer_timeout():
+	
+	# Hides the message
+	$Message.hide()
