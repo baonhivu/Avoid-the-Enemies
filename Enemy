@@ -1,0 +1,21 @@
+extends RigidBody2D
+
+
+# Declare member variables here. 
+
+export var min_speed = 150
+export var max_speed = 250
+
+
+# Called when the node enters the scene tree for the first time.
+func _ready():
+	
+	# Gets all different types of enemies and randomly choose an enemy to generate. 
+	var enemy_types = $AnimatedSprite.frames.get_animation_names()
+	$AnimatedSprite.animation = enemy_types[randi() % enemy_types.size()]
+
+
+func _on_VisibilityNotifier2D_screen_exited():
+	
+	# Delete enemies from outside of game window. 
+	queue_free()
